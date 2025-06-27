@@ -20,7 +20,7 @@ import java.util.UUID;
 
 
 @Service
-@Slf4j // optional
+// @Slf4j // optional
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 public class ContactService {
@@ -37,54 +37,68 @@ public class ContactService {
 
     public Contact createContact(Contact contact) {
         // If no ID is set, generate one using UUID
-        if(contact.getId() == null || contact.getId().isEmpty()){
-            contact.setId(UUID.randomUUID().toString());
-        }
+//        if(contact.getId() == null || contact.getId().isEmpty()){
+//            contact.setId(UUID.randomUUID().toString());
+//        }
         return contactRepo.save(contact);
     }
 
     public void deleteContact(String id) {
+        Contact contact = getContactById(id); // Get the contact with photoUrl
+
+        // Delete the image if it exists
+        if (contact.getPhotoUrl() != null && !contact.getPhotoUrl().isEmpty()) {
+            try {
+                // Extract filename from URL
+                String[] parts = contact.getPhotoUrl().split("/images/");
+                if (parts.length == 2) {
+                    String filename = parts[1];
+                    Path filePath = Paths.get(System.getProperty("user.dir"), "static", "images", filename);
+                    Files.deleteIfExists(filePath); // Delete image file
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to delete image file: " + e.getMessage());
+            }
+        }
+
+        // Delete the contact from DB
         contactRepo.deleteById(id);
     }
 
+
     public String uploadPhoto(String id, MultipartFile file) {
-        try {
-            // 1. Get the contact
-            Contact contact = getContactById(id);
+        return contactRepo.findById(id).map(contact -> {
+            try {
+                String originalFilename = file.getOriginalFilename();
+                String fileExtension = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(originalFilename.lastIndexOf('.'))
+                        : ".png";
 
-            // 2. Extract file extension
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = originalFilename != null && originalFilename.contains(".")
-                    ? originalFilename.substring(originalFilename.lastIndexOf('.'))
-                    : ".png";
-            String newFilename = id + fileExtension;
+                String newFilename = id + fileExtension;
 
-            // 3. Build dynamic path under /static/images
-            Path staticDir = Paths.get(System.getProperty("user.dir"), "static", "images");
-            if (!Files.exists(staticDir)) {
-                Files.createDirectories(staticDir); // Create /static/images if not exists
+                Path staticDir = Paths.get(System.getProperty("user.dir"), "static", "images");
+                if (!Files.exists(staticDir)) {
+                    Files.createDirectories(staticDir);
+                }
+
+                Path filePath = staticDir.resolve(newFilename);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                String photoUrl = ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/images/")
+                        .path(newFilename)
+                        .toUriString();
+
+                contact.setPhotoUrl(photoUrl);
+
+                return contactRepo.saveAndFlush(contact).getPhotoUrl();  // Return the saved value from managed entity
+
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload image: " + e.getMessage());
             }
-
-            // 4. Save file to /static/images
-            Path filePath = staticDir.resolve(newFilename);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // 5. Generate URL like: http://localhost:8080/images/abc123.png
-            String photoUrl = ServletUriComponentsBuilder
-                    .fromCurrentContextPath()
-                    .path("/images/")
-                    .path(newFilename)
-                    .toUriString();
-
-            // 6. Save photo URL in DB
-            contact.setPhotoUrl(photoUrl);
-            contactRepo.save(contact);
-
-            return photoUrl;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to upload image: " + e.getMessage());
-        }
+        }).orElseThrow(() -> new RuntimeException("Contact not found with ID: " + id));
     }
+
 
 }

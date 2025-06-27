@@ -1,5 +1,6 @@
 package in.avijit.Contact_Management_API.Controller;
 
+import in.avijit.Contact_Management_API.DTO.PagedResponse;
 import in.avijit.Contact_Management_API.Entities.Contact;
 import in.avijit.Contact_Management_API.Services.ContactService;
 import jakarta.validation.Valid;
@@ -18,10 +19,21 @@ public class ContactController
 
     // Get all contacts with Pagination
     @GetMapping
-    public ResponseEntity<Page<Contact>> getAllContacts(
+    public ResponseEntity<PagedResponse> getAllContacts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(contactService.getAllContacts(page,size));
+
+        Page<Contact> contactPage = contactService.getAllContacts(page, size);
+
+        PagedResponse response = new PagedResponse(
+                contactPage.getContent(),
+                contactPage.getNumber(),
+                contactPage.getSize(),
+                contactPage.getTotalElements(),
+                contactPage.getTotalPages(),
+                contactPage.isLast()
+        );
+        return ResponseEntity.ok(response);
     }
 
     // Get a specific contact by ID
