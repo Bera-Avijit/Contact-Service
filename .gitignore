@@ -1,0 +1,56 @@
+# === Frontend ===
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# === Frontend Logs ===
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# === Editor Directories ===
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === Backend (Spring Boot - Contact_Management_API) ===
+Contact_Management_API/target/
+Contact_Management_API/.mvn/wrapper/maven-wrapper.jar
+Contact_Management_API/HELP.md
+
+# STS / Eclipse specific
+Contact_Management_API/.apt_generated
+Contact_Management_API/.classpath
+Contact_Management_API/.factorypath
+Contact_Management_API/.project
+Contact_Management_API/.settings/
+Contact_Management_API/.springBeans
+Contact_Management_API/.sts4-cache
+
+# IntelliJ IDEA
+Contact_Management_API/*.iws
+Contact_Management_API/*.iml
+Contact_Management_API/*.ipr
+Contact_Management_API/.idea/
+
+# NetBeans
+Contact_Management_API/nbproject/private/
+Contact_Management_API/nbbuild/
+Contact_Management_API/dist/
+Contact_Management_API/nbdist/
+Contact_Management_API/.nb-gradle/
+Contact_Management_API/build/
+
+# VS Code (if used in backend too)
+Contact_Management_API/.vscode/
