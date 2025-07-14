@@ -524,7 +524,7 @@ dialog[open] {
   font-size: 14px;
   color: #777;
   margin-top: 40px;
-  border-top: 1px solid #eee;
+  border-top: 2px solid #eee;
 }
 
 @keyframes fadeIn {

@@ -7,7 +7,7 @@ import {
   updatePhoto,
 } from "./API/ContactService";
 import Header from "./components/Header";
-import ContactList from "./components/ContactList";
+import ContactList from "./Components/ContactList";
 import { Routes, Route, Navigate } from "react-router-dom";
 import NewContact from "./Components/NewContact";
 import ContactDetail from "./Components/ContactDetail";
