@@ -518,6 +518,15 @@ dialog[open] {
   display: block !important;
 }
 
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 14px;
+  color: #777;
+  margin-top: 40px;
+  border-top: 1px solid #eee;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

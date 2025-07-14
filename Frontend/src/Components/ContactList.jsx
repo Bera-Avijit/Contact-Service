@@ -50,6 +50,10 @@ const ContactList = ({
           </a>
         </div>
       )}
+      {/* Footer */}
+      <footer className="footer">
+        © 2025 Avijit Bera | Contact Management Project. All rights reserved.
+      </footer>
     </main>
   );
 };
