@@ -37,7 +37,7 @@ function App() {
     status: "",
   });
 
-  const getAllContacts = async (page = 0, size = 10) => {
+  const getAllContacts = async (page = 0, size = 6) => {
     try {
       const response = await getContacts(page, size);
       setData(response.data);

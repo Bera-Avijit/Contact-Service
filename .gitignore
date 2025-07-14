@@ -3,6 +3,8 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+ScreenShots/
+static/images/
 
 # === Frontend Logs ===
 logs
@@ -54,3 +56,5 @@ Contact_Management_API/build/
 
 # VS Code (if used in backend too)
 Contact_Management_API/.vscode/
+
+Contact Persons/

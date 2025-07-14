@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { getContact } from "../API/ContactService";
 import { toastError, toastSuccess } from "../API/ToastService";
 
@@ -18,6 +18,8 @@ const ContactDetail = ({ onUpdateContact, updateImage }) => {
 
   const { id } = useParams();
   console.log("ContactDetail id:", id);
+
+  const navigate = useNavigate();
 
   const getContactDetail = async () => {
     try {
@@ -44,14 +46,21 @@ const ContactDetail = ({ onUpdateContact, updateImage }) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("id", id); // Append the contact ID to the form data
+      formData.append("id", id);
 
       await updateImage(formData);
 
+      // ✅ Immediately fetch latest contact info from backend (with updated photo URL)
+      const response = await getContact(id);
+      const updatedPhotoUrl = `${
+        response.data.photoUrl
+      }?updated_at=${Date.now()}`;
+
       setContact((prevContact) => ({
-        ...prevContact,
-        photoUrl: `${prevContact.photoUrl}?updated_at=${Date.now()}`, // Trick browser to reload image (cache-busting)
+        ...response.data,
+        photoUrl: updatedPhotoUrl,
       }));
+
       toastSuccess("Photo updated successfully!");
     } catch (error) {
       console.error("Error updating photo:", error);
@@ -75,9 +84,16 @@ const ContactDetail = ({ onUpdateContact, updateImage }) => {
         contactToUpdate.photoUrl.split("?updated_at")[0];
     }
 
-    await onUpdateContact(contactToUpdate);
-    getContactDetail();
-    toastSuccess("Contact updated successfully!");
+    try {
+      await onUpdateContact(contactToUpdate);
+      toastSuccess("Contact updated successfully!");
+
+      // ✅ Redirect after success
+      navigate("/contacts");
+    } catch (error) {
+      console.error("Error updating contact:", error);
+      toastError(error.message);
+    }
   };
 
   useEffect(() => {
